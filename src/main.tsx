@@ -1,23 +1,70 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import './index.css';
-import { createRouter, RouterProvider } from '@tanstack/react-router';
+import './main.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { AuthContextProvider } from '@/contexts/AuthContext';
 import { routeTree } from './routeTree.gen';
-import App from './App';
+import { useAuth } from './hooks/useAuth';
+import { Toaster } from '@/components/ui/sonner';
 
-const router = createRouter({ routeTree });
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
-// Register the router instance for type safety
+const router = createRouter({
+  routeTree,
+  context: {
+    queryClient,
+    auth: undefined!,
+  },
+  defaultPreload: 'intent',
+  defaultPreloadStaleTime: 0,
+});
+
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App>
-      <RouterProvider router={router} />
-    </App>
-  </StrictMode>,
-);
+function Router() {
+  const auth = useAuth();
+  return <RouterProvider router={router} context={{ queryClient, auth }} />;
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthContextProvider>
+        <Router />
+        <Toaster />
+      </AuthContextProvider>
+    </QueryClientProvider>
+  );
+}
+
+const rootElement = document.getElementById('root')!;
+
+// Check if root already exists to prevent duplicate root creation
+if (!rootElement.hasAttribute('data-root-initialized')) {
+  rootElement.setAttribute('data-root-initialized', 'true');
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
+}
+
+// ReactDOM.createRoot(document.getElementById('root')!).render(
+//   <React.StrictMode>
+//     <App />
+//   </React.StrictMode>,
+// );
