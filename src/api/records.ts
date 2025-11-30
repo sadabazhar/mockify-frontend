@@ -15,9 +15,9 @@ export const recordsApi = {
     return response.data;
   },
 
-  getAll: async (schemaId: number): Promise<MockRecord> => {
-    const response = await apiClient.get<MockRecord>(
-      `/schemas/${schemaId}/records"`,
+  getAll: async (schemaId: number): Promise<MockRecord[]> => {
+    const response = await apiClient.get<MockRecord[]>(
+      `/schemas/${schemaId}/records`,
     );
     return response.data;
   },
