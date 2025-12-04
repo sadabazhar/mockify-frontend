@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
@@ -23,6 +24,11 @@ import { Route as ProtectedSchemasSchemaIdRouteImport } from './routes/_protecte
 import { Route as ProtectedProjectsProjectIdRouteImport } from './routes/_protected/projects/$projectId'
 import { Route as ProtectedOrganizationsOrgIdRouteImport } from './routes/_protected/organizations/$orgId'
 
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PublicRouteRoute = PublicRouteRouteImport.update({
   id: '/_public',
   getParentRoute: () => rootRouteImport,
@@ -91,6 +97,7 @@ const ProtectedOrganizationsOrgIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/$': typeof SplatRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/dashboard': typeof ProtectedDashboardRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/organizations': typeof ProtectedOrganizationsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/$': typeof SplatRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/dashboard': typeof ProtectedDashboardRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/_public': typeof PublicRouteRouteWithChildren
+  '/$': typeof SplatRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
@@ -133,6 +142,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/$'
     | '/login'
     | '/register'
     | '/dashboard'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/organizations'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/$'
     | '/login'
     | '/register'
     | '/dashboard'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/_protected'
     | '/_public'
+    | '/$'
     | '/_auth/login'
     | '/_auth/register'
     | '/_protected/dashboard'
@@ -176,11 +188,19 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
+  SplatRoute: typeof SplatRoute
   Oauth2RedirectRoute: typeof Oauth2RedirectRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_public': {
       id: '/_public'
       path: ''
@@ -327,6 +347,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   PublicRouteRoute: PublicRouteRouteWithChildren,
+  SplatRoute: SplatRoute,
   Oauth2RedirectRoute: Oauth2RedirectRoute,
 }
 export const routeTree = rootRouteImport

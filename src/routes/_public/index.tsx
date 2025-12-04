@@ -1,12 +1,16 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Database, Zap, Shield } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 export const Route = createFileRoute('/_public/')({
   component: IndexPage,
 });
 
 function IndexPage() {
+
+  const {isAuthenticated} = useAuth();
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Hero */}
@@ -23,16 +27,21 @@ function IndexPage() {
           </p>
         </div>
         <div className="flex flex-col gap-4 sm:flex-row">
-          <Link to="/register">
-            <Button size="lg" className="gap-2 cursor-pointer">
-              Get Started <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-          <Link to="/login">
-            <Button size="lg" className="cursor-pointer" variant="outline">
-              Sign In
-            </Button>
-          </Link>
+        {/* Only show when user is NOT logged in */}
+        {!isAuthenticated && (
+          <div className="flex gap-4">
+            <Link to="/register">
+              <Button size="lg" className="gap-2 cursor-pointer">
+                Get Started <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link to="/login">
+              <Button size="lg" className="cursor-pointer" variant="outline">
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        )}
         </div>
       </section>
 
