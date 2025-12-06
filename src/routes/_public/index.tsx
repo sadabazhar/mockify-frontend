@@ -9,7 +9,7 @@ export const Route = createFileRoute('/_public/')({
 
 function IndexPage() {
 
-  const {isAuthenticated} = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -26,10 +26,9 @@ function IndexPage() {
             Perfect for development and testing.
           </p>
         </div>
-        <div className="flex flex-col gap-4 sm:flex-row">
         {/* Only show when user is NOT logged in */}
         {!isAuthenticated && (
-          <div className="flex gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row">
             <Link to="/register">
               <Button size="lg" className="gap-2 cursor-pointer">
                 Get Started <ArrowRight className="h-4 w-4" />
@@ -40,9 +39,8 @@ function IndexPage() {
                 Sign In
               </Button>
             </Link>
-          </div>
-        )}
         </div>
+        )}
       </section>
 
       {/* Features */}
