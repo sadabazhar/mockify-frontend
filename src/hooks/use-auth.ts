@@ -2,14 +2,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '@/api/auth';
 import { toast } from 'sonner';
 import type { LoginRequest, RegisterRequest, User } from '@/api/types';
+import { tokenStore } from '@/api/token';
 
 export const CURRENT_USER_KEY = ['auth', 'me'];
 
-export function useCurrentUser() {
+export function useCurrentUser(options?: { enabled: boolean }) {
   return useQuery<User>({
     queryKey: CURRENT_USER_KEY,
     queryFn: authApi.getCurrentUser,
     retry: false,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    enabled: options?.enabled ?? true,
   });
 }
 
@@ -18,12 +22,15 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
-    onSuccess: (res) => {
-      localStorage.setItem('accessToken', res.access_token);
-      toast.success('Logged in');
 
-      queryClient.setQueryData(CURRENT_USER_KEY, res.user);
-      queryClient.invalidateQueries({ queryKey: CURRENT_USER_KEY });
+    onSuccess: async (res) => {
+      tokenStore.set(res.access_token);
+
+      await queryClient.invalidateQueries({
+        queryKey: CURRENT_USER_KEY,
+      });
+
+      toast.success('Logged in');
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || 'Invalid login');
@@ -36,12 +43,15 @@ export function useRegister() {
 
   return useMutation({
     mutationFn: (data: RegisterRequest) => authApi.register(data),
-    onSuccess: (res) => {
-      localStorage.setItem('accessToken', res.access_token);
-      toast.success('Account created');
 
-      queryClient.setQueryData(CURRENT_USER_KEY, res.user);
-      queryClient.invalidateQueries({ queryKey: CURRENT_USER_KEY });
+    onSuccess: async (res) => {
+      tokenStore.set(res.access_token);
+
+      await queryClient.invalidateQueries({
+        queryKey: CURRENT_USER_KEY,
+      });
+
+      toast.success('Account created');
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || 'Registration failed');
@@ -54,18 +64,41 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: () => authApi.logout(),
+
     onSuccess: () => {
-      localStorage.removeItem('accessToken');
-
-      queryClient.removeQueries({ queryKey: CURRENT_USER_KEY });
-
+      tokenStore.clear();
+      queryClient.setQueryData(CURRENT_USER_KEY, null);
       toast.success('Logged out');
     },
     onError: () => {
-      // Even if server fails, clear client state
-      localStorage.removeItem('accessToken');
-      queryClient.removeQueries({ queryKey: CURRENT_USER_KEY });
+      tokenStore.clear();
+      queryClient.setQueryData(CURRENT_USER_KEY, null);
     },
+  });
+}
+
+export function useAuthBootstrap() {
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: ['auth', 'bootstrap'],
+    queryFn: async () => {
+      try {
+        const res = await authApi.refresh();
+        tokenStore.set(res.access_token);
+        await queryClient.invalidateQueries({
+          queryKey: CURRENT_USER_KEY,
+        });
+
+        return res.user;
+      } catch {
+        tokenStore.clear();
+        return null;
+      }
+    },
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 }
 
