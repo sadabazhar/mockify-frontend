@@ -7,36 +7,27 @@ export function useForgotPassword() {
     mutationFn: (email: string) => authApi.forgotPassword(email),
 
     onSuccess: () => {
-      toast.success(
-        'Check your email for a link to reset your password'
-      );
+      toast.success('Check your email for a link to reset your password');
     },
 
     onError: () => {
       // Always generic (security)
-      toast.success(
-        'Check your email for a link to reset your password'
-      );
+      toast.success('Check your email for a link to reset your password');
     },
   });
 }
 
 export function useResetPassword() {
   return useMutation({
-    mutationFn: (data: {
-      token: string;
-      newPassword: string;
-    }) => authApi.resetPassword(data),
+    mutationFn: (data: { token: string; newPassword: string }) =>
+      authApi.resetPassword(data),
 
     onSuccess: () => {
       toast.success('Password updated successfully');
     },
 
     onError: () => {
-      toast.error(
-        'Invalid or expired reset link'
-      );
+      toast.error('Invalid or expired reset link');
     },
   });
 }
-

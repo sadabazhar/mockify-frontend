@@ -15,6 +15,7 @@ import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as Oauth2RedirectRouteImport } from './routes/oauth2/redirect'
+import { Route as PublicVerifyEmailRouteImport } from './routes/_public/verify-email'
 import { Route as PublicDocsRouteImport } from './routes/_public/docs'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
@@ -51,6 +52,11 @@ const Oauth2RedirectRoute = Oauth2RedirectRouteImport.update({
   id: '/oauth2/redirect',
   path: '/oauth2/redirect',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PublicVerifyEmailRoute = PublicVerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => PublicRouteRoute,
 } as any)
 const PublicDocsRoute = PublicDocsRouteImport.update({
   id: '/docs',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof AuthResetPasswordRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/docs': typeof PublicDocsRoute
+  '/verify-email': typeof PublicVerifyEmailRoute
   '/oauth2/redirect': typeof Oauth2RedirectRoute
   '/': typeof PublicIndexRoute
   '/organizations/$orgId': typeof ProtectedOrganizationsOrgIdRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof AuthResetPasswordRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/docs': typeof PublicDocsRoute
+  '/verify-email': typeof PublicVerifyEmailRoute
   '/oauth2/redirect': typeof Oauth2RedirectRoute
   '/': typeof PublicIndexRoute
   '/organizations/$orgId': typeof ProtectedOrganizationsOrgIdRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_public/docs': typeof PublicDocsRoute
+  '/_public/verify-email': typeof PublicVerifyEmailRoute
   '/oauth2/redirect': typeof Oauth2RedirectRoute
   '/_public/': typeof PublicIndexRoute
   '/_protected/organizations/$orgId': typeof ProtectedOrganizationsOrgIdRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/docs'
+    | '/verify-email'
     | '/oauth2/redirect'
     | '/'
     | '/organizations/$orgId'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/docs'
+    | '/verify-email'
     | '/oauth2/redirect'
     | '/'
     | '/organizations/$orgId'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/_auth/reset-password'
     | '/_protected/dashboard'
     | '/_public/docs'
+    | '/_public/verify-email'
     | '/oauth2/redirect'
     | '/_public/'
     | '/_protected/organizations/$orgId'
@@ -247,6 +259,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/oauth2/redirect'
       preLoaderRoute: typeof Oauth2RedirectRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_public/verify-email': {
+      id: '/_public/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof PublicVerifyEmailRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
     '/_public/docs': {
       id: '/_public/docs'
@@ -352,11 +371,13 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 
 interface PublicRouteRouteChildren {
   PublicDocsRoute: typeof PublicDocsRoute
+  PublicVerifyEmailRoute: typeof PublicVerifyEmailRoute
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicDocsRoute: PublicDocsRoute,
+  PublicVerifyEmailRoute: PublicVerifyEmailRoute,
   PublicIndexRoute: PublicIndexRoute,
 }
 

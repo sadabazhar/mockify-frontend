@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { handleApiError } from '@/api/client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useGoogleLogin } from '@/hooks/use-auth';
 
 export const Route = createFileRoute('/_auth/register')({
@@ -50,7 +50,10 @@ const registerSchema = z
 type RegisterForm = z.infer<typeof registerSchema>;
 
 function RegisterPage() {
-  const { register, isAuthenticated } = useAuth();
+  const { register } = useAuth();
+  // CHANGED: removed `isAuthenticated`
+  // WHY: registration should NOT auto-redirect based on auth state
+
   const { initiateGoogleLogin } = useGoogleLogin();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -65,17 +68,20 @@ function RegisterPage() {
     },
   });
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate({ to: '/dashboard' });
-    }
-  }, [isAuthenticated, navigate]);
+  //  REMOVED useEffect that redirected to /dashboard
+  // user is NOT verified yet, should stay public
 
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
     try {
       await register(data.name, data.email, data.password);
-      toast.success('Account created successfully');
+
+      //  CHANGED: message now informs about email verification
+      toast.success(
+        'Account created successfully. Please check your email to verify your account.',
+      );
+
+      // CHANGED: redirect to login instead of dashboard
       navigate({ to: '/dashboard' });
     } catch (error) {
       toast.error(handleApiError(error));
@@ -95,8 +101,8 @@ function RegisterPage() {
             Enter your information to create your Mockify account
           </CardDescription>
         </CardHeader>
+
         <CardContent>
-          {/* Google Sign In Button */}
           <Button
             type="button"
             variant="outline"
@@ -123,6 +129,7 @@ function RegisterPage() {
             </svg>
             Continue with Google
           </Button>
+
           <div className="relative flex justify-center text-xs uppercase mt-4">
             <span className="bg-card px-2 text-muted-foreground">
               Or continue with email
@@ -144,6 +151,7 @@ function RegisterPage() {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="email"
@@ -161,6 +169,7 @@ function RegisterPage() {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="password"
@@ -178,6 +187,7 @@ function RegisterPage() {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="confirmPassword"
@@ -195,12 +205,14 @@ function RegisterPage() {
                   </FormItem>
                 )}
               />
+
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
           </Form>
         </CardContent>
+
         <CardFooter>
           <div className="text-sm text-muted-foreground">
             Already have an account?{' '}

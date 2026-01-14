@@ -39,20 +39,17 @@ export function useLogin() {
 }
 
 export function useRegister() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: RegisterRequest) => authApi.register(data),
 
-    onSuccess: async (res) => {
-      tokenStore.set(res.access_token);
-
-      await queryClient.invalidateQueries({
-        queryKey: CURRENT_USER_KEY,
-      });
-
-      toast.success('Account created');
+    onSuccess: () => {
+      // ✅ DO NOT set token
+      // ✅ DO NOT fetch current user
+      toast.success(
+        'Account created successfully. Please check your email to verify your account.',
+      );
     },
+
     onError: (err: any) => {
       toast.error(err.response?.data?.message || 'Registration failed');
     },

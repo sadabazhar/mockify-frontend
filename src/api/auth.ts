@@ -47,4 +47,11 @@ export const authApi = {
       import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/';
     return `${baseUrl}/oauth2/authorization/google`;
   },
+  verifyEmail: async (token: string): Promise<AuthResponse> => {
+    const response = await apiClient.get<AuthResponse>(
+      '/auth/register/verify',
+      { params: { token } },
+    );
+    return response.data;
+  },
 };

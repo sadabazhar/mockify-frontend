@@ -5,10 +5,7 @@ import {
   useNavigate,
   useSearch,
 } from '@tanstack/react-router';
-import {
-  useForgotPassword,
-  useResetPassword,
-} from '@/hooks/use-password';
+import { useForgotPassword, useResetPassword } from '@/hooks/use-password';
 
 export const Route = createFileRoute('/_auth/reset-password')({
   validateSearch: (search: Record<string, unknown>) => {
@@ -26,11 +23,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md space-y-6">
-        {!token ? (
-          <ForgotPasswordView />
-        ) : (
-          <ResetPasswordView token={token} />
-        )}
+        {!token ? <ForgotPasswordView /> : <ResetPasswordView token={token} />}
       </div>
     </div>
   );
@@ -57,8 +50,8 @@ function ForgotPasswordView() {
         <h1 className="text-xl font-semibold">Reset your password</h1>
 
         <p className="text-sm text-muted-foreground">
-          Check your email for a link to reset your password.
-          If it doesn’t appear within a few minutes, check your spam folder.
+          Check your email for a link to reset your password. If it doesn’t
+          appear within a few minutes, check your spam folder.
         </p>
 
         <Link to="/login" className="text-sm text-primary">
@@ -70,9 +63,7 @@ function ForgotPasswordView() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="text-xl font-semibold text-center">
-        Reset your password
-      </h1>
+      <h1 className="text-xl font-semibold text-center">Reset your password</h1>
 
       <input
         type="email"
@@ -111,9 +102,7 @@ function ResetPasswordView({ token }: { token: string }) {
 
   const isValidPassword =
     password.length >= 15 ||
-    (password.length >= 8 &&
-      /[a-z]/.test(password) &&
-      /[0-9]/.test(password));
+    (password.length >= 8 && /[a-z]/.test(password) && /[0-9]/.test(password));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,16 +125,14 @@ function ResetPasswordView({ token }: { token: string }) {
         onSuccess: () => {
           navigate({ to: '/login' });
         },
-      }
+      },
     );
   };
 
   if (resetPassword.isError) {
     return (
       <div className="space-y-4 text-center">
-        <h1 className="text-xl font-semibold">
-          Reset link invalid or expired
-        </h1>
+        <h1 className="text-xl font-semibold">Reset link invalid or expired</h1>
 
         <p className="text-sm text-muted-foreground">
           Please request a new password reset link.
@@ -165,8 +152,8 @@ function ResetPasswordView({ token }: { token: string }) {
       </h1>
 
       <p className="text-sm text-muted-foreground">
-        Make sure it's at least 15 characters OR at least 8 characters
-        including a number and a lowercase letter.
+        Make sure it's at least 15 characters OR at least 8 characters including
+        a number and a lowercase letter.
       </p>
 
       <input
@@ -191,9 +178,7 @@ function ResetPasswordView({ token }: { token: string }) {
         className="w-full rounded border px-3 py-2"
       />
 
-      {error && (
-        <p className="text-sm text-red-500">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-500">{error}</p>}
 
       <button
         type="submit"
