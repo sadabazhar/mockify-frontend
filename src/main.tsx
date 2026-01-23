@@ -7,6 +7,7 @@ import { AuthContextProvider } from '@/contexts/AuthContext';
 import { routeTree } from './routeTree.gen';
 import { useAuth } from './hooks/useAuth';
 import { Toaster } from '@/components/ui/sonner';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,7 +59,9 @@ if (!rootElement.hasAttribute('data-root-initialized')) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      <App />
+      <ThemeProvider>
+          <App />
+      </ThemeProvider>
     </React.StrictMode>,
   );
 }
