@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useSchemaStats } from '@/hooks/use-DashboardStats';
 
 export const Route = createFileRoute('/_protected/_schemas/$orgSlug/$projectSlug/$schemaSlug')({
   component: SchemaDetail,
@@ -32,6 +33,7 @@ export const Route = createFileRoute('/_protected/_schemas/$orgSlug/$projectSlug
 function SchemaDetail() {
   const { orgSlug, projectSlug, schemaSlug } = Route.useParams();
   const { data: schema, isLoading } = useSchema(orgSlug, projectSlug, schemaSlug);
+  const { data: schemaStats, isLoading: isSchemaStatsLoading } = useSchemaStats(schema?.id);
   const createRecordMutation = useCreateRecord(orgSlug, projectSlug, schemaSlug);
   const deleteRecordMutation = useDeleteRecord(orgSlug, projectSlug, schemaSlug);
 
@@ -144,7 +146,7 @@ function SchemaDetail() {
                     Cancel
                   </Button>
                   <Button
-                    onClick={() => handleCreateRecord(schemaSlug)}
+                    onClick={() => handleCreateRecord()}
                     disabled={createRecordMutation.isPending}
                   >
                     {createRecordMutation.isPending ? 'Creating...' : 'Create'}
@@ -157,34 +159,44 @@ function SchemaDetail() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Records</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {schema.stats.totalRecords}
+              {isSchemaStatsLoading ? '...' : schemaStats?.recordCount}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Active</CardTitle>
+            <CardTitle className="text-sm font-medium">Active Records</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {schema.stats.activeRecords}
+              {isSchemaStatsLoading ? '...' : schemaStats?.activeRecords}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Expired</CardTitle>
+            <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-600">
+              {isSchemaStatsLoading ? '...' : schemaStats?.expiringSoonRecords}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Expired Records</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
-              {schema.stats.expiredRecords}
+              {isSchemaStatsLoading ? '...' : schemaStats?.expiredRecords}
             </div>
           </CardContent>
         </Card>

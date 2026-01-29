@@ -47,6 +47,9 @@ export function useCreateSchema(
       queryClient.invalidateQueries({
         queryKey: ['projects', orgSlug, projectSlug],
       });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'project']}); 
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'schema']}); 
     },
   });
 }
@@ -79,6 +82,8 @@ export function useUpdateSchema(
           schemaSlug,
         ],
       });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'project']}); 
     },
   });
 }
@@ -97,6 +102,8 @@ export function useDeleteSchema(
       queryClient.invalidateQueries({
         queryKey: ['projects', orgSlug, projectSlug],
       });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'project']}); 
     },
 
     onError: (error: any) => {

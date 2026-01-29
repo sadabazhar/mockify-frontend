@@ -160,3 +160,37 @@ export interface ApiError {
   path: string;
   validationErrors?: Record<string, string[]>;
 }
+
+export interface UserStats {
+  organizationCount: number;
+  projectCount: number;
+  schemaCount: number;
+  recordCount: number;
+}
+
+export interface OrganizationStats {
+  projectCount: number;
+  schemaCount: number;
+  recordCount: number;
+}
+
+export interface ProjectStats {
+  schemaCount: number;
+  recordCount: number;
+  activeRecords: number;
+  expiredRecords: number;
+}
+
+export interface SchemaStats {
+  recordCount: number;
+  activeRecords: number;
+  expiredRecords: number;
+  expiringSoonRecords: number;
+}
+
+export interface RecordHealthStats {
+  totalRecords: number;
+  totalActiveRecords: number;
+  totalExpiredRecords: number;
+  totalExpiringSoonRecords: number;
+}

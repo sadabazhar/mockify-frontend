@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatRelativeTime } from '@/lib/utils';
+import { useProjectStats } from '@/hooks/use-DashboardStats';
 
 export const Route = createFileRoute('/_protected/_projects/$orgSlug/$projectSlug')({
   component: ProjectDetail,
@@ -41,6 +42,8 @@ export const Route = createFileRoute('/_protected/_projects/$orgSlug/$projectSlu
 function ProjectDetail() {
   const { orgSlug, projectSlug } = Route.useParams();
   const { data: project, isLoading } = useProject(orgSlug, projectSlug);
+  const { data: projectStats, isLoading: isProjectStatsLoading } = useProjectStats(project?.id);
+  console.log("Project Stats: ", projectStats);
 
   const createSchemaMutation = useCreateSchema(orgSlug, projectSlug);
   const deleteSchemaMutation = useDeleteSchema(orgSlug, projectSlug);
@@ -204,7 +207,7 @@ function ProjectDetail() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {project.stats.totalSchemas}
+              {isProjectStatsLoading ? '...' : projectStats?.schemaCount}
             </div>
           </CardContent>
         </Card>
@@ -214,7 +217,7 @@ function ProjectDetail() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {project.stats.totalRecords}
+              {isProjectStatsLoading ? '...' : projectStats?.recordCount}
             </div>
           </CardContent>
         </Card>
@@ -226,7 +229,7 @@ function ProjectDetail() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {project.stats.activeRecords}
+              {isProjectStatsLoading ? '...' : projectStats?.activeRecords}
             </div>
           </CardContent>
         </Card>

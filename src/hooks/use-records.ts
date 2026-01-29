@@ -46,6 +46,12 @@ export function useCreateRecord(
       queryClient.invalidateQueries({
         queryKey: ['schemas', orgSlug, projectSlug, schemaSlug],
       });
+            queryClient.invalidateQueries({
+        queryKey: ['projects', orgSlug, projectSlug],
+      });
+        queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
+        queryClient.invalidateQueries({queryKey: ['dashboard', 'project']});
+        queryClient.invalidateQueries({queryKey: ['dashboard', 'schema']});  
       toast.success('Record created successfully');
     },
 
@@ -69,10 +75,16 @@ export function useUpdateRecord(
       recordsApi.update(orgSlug, projectSlug, schemaSlug, recordId, data),
 
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ['records', result.id] });
-      queryClient.invalidateQueries({
+        queryClient.invalidateQueries({ queryKey: ['records', result.id] });
+        queryClient.invalidateQueries({
         queryKey: ['schemas', result.schemaId, 'records'],
       });
+        queryClient.invalidateQueries({
+        queryKey: ['projects', orgSlug, projectSlug],
+      });
+        queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
+        queryClient.invalidateQueries({queryKey: ['dashboard', 'project']});
+        queryClient.invalidateQueries({queryKey: ['dashboard', 'schema']}); 
       toast.success('Record updated successfully');
     },
     onError: (error: any) => {
@@ -96,6 +108,12 @@ export function useDeleteRecord(
       queryClient.invalidateQueries({
         queryKey: ['schemas', orgSlug, projectSlug, schemaSlug],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['projects', orgSlug, projectSlug],
+      });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'project']}); 
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'schema']}); 
       toast.success('Record deleted successfully');
     },
 
