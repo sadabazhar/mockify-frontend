@@ -24,15 +24,15 @@ export const Route = createFileRoute('/_protected/dashboard')({
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const { data: organizations, isLoading } = useOrganizations();
-  console.log(organizations);
+  const { data: organizations = [], isLoading } = useOrganizations();
 
   if (isLoading) {
     return <LoadingSpinner fullScreen />;
   }
 
   return (
-    <div className="container py-8">
+   
+    <div className="py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">
           Welcome back, {user?.name}!
@@ -41,35 +41,36 @@ export function DashboardPage() {
           Here's an overview of your Mockify workspace
         </p>
       </div>
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+     
+      <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Organizations</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">
+              Organizations
+            </CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? '...' : organizations?.length}
+              {organizations.length}
             </div>
-            <p className="text-xs text-muted-foreground">Total organizations</p>
+            <p className="text-xs text-muted-foreground">
+              Total organizations
+            </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Projects</CardTitle>
             <FolderKanban className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading
-                ? '...'
-                : organizations?.reduce(
-                    (acc, org) => acc + org.projectCount,
-                    0,
-                  )}
+              {organizations.reduce(
+                (acc, org) => acc + org.projectCount,
+                0
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
               Across all organizations
@@ -78,18 +79,20 @@ export function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Schemas</CardTitle>
             <FileCode className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">Mock data schemas</p>
+            <p className="text-xs text-muted-foreground">
+              Mock data schemas
+            </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Records</CardTitle>
             <Database className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -101,8 +104,7 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Quick Actions */}
+     
       <Card>
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
@@ -119,12 +121,13 @@ export function DashboardPage() {
             </Button>
           </Link>
           <Link to="/organizations">
-            <Button variant="outline">View All Organizations</Button>
+            <Button variant="outline">
+              View All Organizations
+            </Button>
           </Link>
         </CardContent>
       </Card>
-
-      {/* Recent Organizations */}
+    
       {organizations.length > 0 && (
         <Card className="mt-8">
           <CardHeader>
@@ -140,7 +143,9 @@ export function DashboardPage() {
                   key={org.id}
                   to="/organizations/$orgSlug"
                   params={{ orgSlug: org.slug }}
-                  className="flex items-center justify-between rounded-lg border p-4 hover:bg-muted/50 transition-colors"
+                  className="
+                    flex items-center justify-between rounded-lg border p-4
+                    transition-colors hover:bg-muted/50"
                 >
                   <div className="flex items-center gap-3">
                     <Building2 className="h-8 w-8 text-primary" />
@@ -162,5 +167,5 @@ export function DashboardPage() {
         </Card>
       )}
     </div>
-  );
+  )
 }

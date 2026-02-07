@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useEffect } from 'react';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import { Header } from '@/components/layout/Header';
+import { LayoutContainer } from '@/components/layout/LayoutContainer';
 
 export const Route = createFileRoute('/_protected')({
   component: ProtectedLayout,
@@ -21,11 +22,12 @@ function ProtectedLayout() {
   if (isLoading) return <LoadingSpinner fullScreen />;
 
   return (
-    <div>
-      {/* TODO: Replace with a shared Dashboard layout, including dashboard specific header, sidebar etc.. */}
+    <div className="min-h-screen w-full bg-background">
       <Header />
-      <main className="container px-4 py-8">
-        <Outlet />
+      <main className="py-8">
+        <LayoutContainer>
+          <Outlet />
+        </LayoutContainer>
       </main>
     </div>
   );
