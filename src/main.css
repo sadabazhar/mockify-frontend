@@ -138,14 +138,25 @@
   *,
   *::before,
   *::after {
-    outline: none;
+    box-sizing: border-box;
   }
 
-  :where(button, input, select, textarea) {
-    --tw-ring-color: transparent;
-    --tw-ring-offset-width: 0px;
-    --tw-ring-shadow: 0 0 #0000;
-  }
+:where(
+  button,
+  a,
+  a[role="button"],
+  [role="button"],
+  input,
+  select,
+  textarea
+):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px hsl(var(--background)),
+    0 0 0 6px hsl(var(--ring));
+  border-radius: var(--radius);
+}
+
 
   :where(
     header,
