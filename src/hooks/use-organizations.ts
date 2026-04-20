@@ -25,6 +25,7 @@ export function useCreateOrganization() {
     mutationFn: (data: OrganizationInput) => organizationsApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
     },
     onError: (error: any) => {
       toast.error(
@@ -43,6 +44,7 @@ export function useUpdateOrganization() {
     onSuccess: (_, { slug }) => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       queryClient.invalidateQueries({ queryKey: ['organizations', slug] });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
     },
     onError: (error: any) => {
       toast.error(
@@ -59,6 +61,7 @@ export function useDeleteOrganization() {
     mutationFn: (slug: string) => organizationsApi.delete(slug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
     },
     onError: (error: any) => {
       toast.error(

@@ -33,6 +33,7 @@ export function useCreateProject(orgSlug: string) {
       queryClient.invalidateQueries({
         queryKey: ['organizations', orgSlug],
       });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
     },
   });
 }
@@ -56,6 +57,7 @@ export function useUpdateProject(orgSlug: string) {
       queryClient.invalidateQueries({
         queryKey: ['projects', orgSlug, projectSlug],
       });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
     },
   });
 }
@@ -74,6 +76,7 @@ export function useDeleteProject(orgSlug: string) {
       queryClient.invalidateQueries({
         queryKey: ['organizations', orgSlug],
       });
+      queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
     },
   });
 }
