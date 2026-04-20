@@ -3,6 +3,7 @@ import { useApiKeys } from '@/hooks/use-api-key';
 import type { ApiKeyResponse } from '@/api/types';
 import { ApiKeyTable } from '@/components/api-key/ApiKeyTable';
 import { useProjects } from '@/hooks/use-projects';
+import { CreateApiKeyDialog } from '@/components/api-key/CreateApiKeyDialog';
 
 export const Route = createFileRoute(
   '/_protected/organizations/$orgSlug/api-keys/',
@@ -72,10 +73,9 @@ function ApiKeysPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">API Keys</h1>
-        <p className="text-muted-foreground">
-          Managing keys for <strong>{orgSlug}</strong>
-        </p>
       </div>
+
+      {!isLoading && !isError && <CreateApiKeyDialog orgSlug={orgSlug} />}
 
       {!isLoading && !isError && keys.length > 0 && <StatsRow keys={keys} />}
 
