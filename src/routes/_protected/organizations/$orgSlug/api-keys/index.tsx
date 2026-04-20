@@ -1,11 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useApiKeys } from '@/hooks/use-api-key';
 import type { ApiKeyResponse } from '@/api/types';
-import {
-  PermissionBadge,
-  PermissionBadgeList,
-} from '@/components/api-key/PermissionBadge';
-import { KeyReveal } from '@/components/api-key/KeyReveal';
+import { ApiKeyTable } from '@/components/api-key/ApiKeyTable';
+import { useProjects } from '@/hooks/use-projects';
 
 export const Route = createFileRoute(
   '/_protected/organizations/$orgSlug/api-keys/',
@@ -67,6 +64,10 @@ function ApiKeysPage() {
   const { orgSlug } = Route.useParams();
   const { data: keys = [], isLoading, isError } = useApiKeys(orgSlug);
 
+  const { data: projects = [] } = useProjects(orgSlug);
+  const projectNames: Record<string, string> = Object.fromEntries(
+    projects.map((p) => [p.id, p.name]),
+  );
   return (
     <div className="space-y-6">
       <div>
@@ -78,14 +79,13 @@ function ApiKeysPage() {
 
       {!isLoading && !isError && keys.length > 0 && <StatsRow keys={keys} />}
 
-      <div className="flex flex-wrap gap-2 p-4 border rounded-lg">
-        <PermissionBadge resourceType="ORGANIZATION" permission="ADMIN" />
-        <PermissionBadge resourceType="PROJECT" permission="WRITE" />
-        <PermissionBadge resourceType="SCHEMA" permission="READ" />
-        <PermissionBadge resourceType="RECORD" permission="DELETE" />
-      </div>
-
-      <KeyReveal plainTextKey="mk_live_xK8mPqN2vTdR5hYjW1cAeUfBgLsOiZn" />
+      {!isLoading && !isError && keys.length > 0 && (
+        <ApiKeyTable
+          orgSlug={orgSlug}
+          keys={keys}
+          projectNames={projectNames}
+        />
+      )}
     </div>
   );
 }
