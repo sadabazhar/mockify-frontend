@@ -15,7 +15,7 @@ function StatsRow({ keys }: { keys: ApiKeyResponse[] }) {
   const expired = keys.filter(
     (k) => k.expiresAt && new Date(k.expiresAt) < now,
   ).length;
-  const revoked = keys.filter((k) => !k.isActive).length;
+  const revoked = keys.filter((k) => !k.active).length;
   const active = keys.length - revoked - expired;
   const orgWide = keys.filter((k) => !k.projectId).length;
   const projScoped = keys.filter((k) => !!k.projectId).length;

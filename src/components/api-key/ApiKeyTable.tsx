@@ -114,13 +114,13 @@ function RowActions({ orgSlug, apiKey, isExpired }: RowActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          {apiKey.isActive && !isExpired && (
+          {apiKey.active && !isExpired && (
             <DropdownMenuItem onClick={() => setModal('rotate')}>
               <RefreshCw className="mr-2 h-3.5 w-3.5" />
               Rotate key
             </DropdownMenuItem>
           )}
-          {apiKey.isActive && (
+          {apiKey.active && (
             <DropdownMenuItem
               className="text-destructive focus:text-destructive"
               onClick={() => setModal('revoke')}
@@ -129,7 +129,7 @@ function RowActions({ orgSlug, apiKey, isExpired }: RowActionsProps) {
               Revoke key
             </DropdownMenuItem>
           )}
-          {apiKey.isActive && <DropdownMenuSeparator />}
+          {apiKey.active && <DropdownMenuSeparator />}
           <DropdownMenuItem
             className="text-destructive focus:text-destructive"
             onClick={() => setModal('delete')}
@@ -295,7 +295,7 @@ export function ApiKeyTable({
 
             {/* Status */}
             <div>
-              <StatusBadge active={key.isActive} expired={isExpired} />
+              <StatusBadge active={key.active} expired={isExpired} />
             </div>
 
             {/* Actions */}

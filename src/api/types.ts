@@ -211,7 +211,7 @@ export interface ApiKeyResponse {
   rateLimitPerMinute: number;
 
   /** false after revocation */
-  isActive: boolean;
+  active: boolean;
 
   /** ISO-8601 datetime; absent = never expires */
   expiresAt?: string;
@@ -262,7 +262,7 @@ export interface UpdateApiKeyRequest {
   rateLimitPerMinute?: number;
 
   /** Activate/deactivate key */
-  isActive?: boolean;
+  active?: boolean;
 
   /** Update expiry */
   expiresAt?: string;
