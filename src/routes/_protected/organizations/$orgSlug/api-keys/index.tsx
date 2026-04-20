@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { useApiKeys } from '@/hooks/use-api-key';
 
 export const Route = createFileRoute(
   '/_protected/organizations/$orgSlug/api-keys/',
@@ -8,6 +9,7 @@ export const Route = createFileRoute(
 
 function ApiKeysPage() {
   const { orgSlug } = Route.useParams();
+  const { data: keys = [], isLoading, isError } = useApiKeys(orgSlug);
 
   return (
     <div className="space-y-6">
@@ -17,7 +19,12 @@ function ApiKeysPage() {
           Managing keys for <strong>{orgSlug}</strong>
         </p>
       </div>
-      <p className="text-muted-foreground">Workin on it…</p>
+
+      {isLoading && <p className="text-muted-foreground">Loading…</p>}
+      {isError && <p className="text-destructive">Failed to load keys.</p>}
+      {!isLoading && !isError && (
+        <p className="text-muted-foreground">{keys.length} key(s) found</p>
+      )}
     </div>
   );
 }
