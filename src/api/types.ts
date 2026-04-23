@@ -194,3 +194,11 @@ export interface RecordHealthStats {
   totalExpiredRecords: number;
   totalExpiringSoonRecords: number;
 }
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}

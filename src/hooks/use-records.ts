@@ -1,6 +1,37 @@
 import { recordsApi } from '@/api/records';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useInfiniteQuery } from '@tanstack/react-query';
+
+export function useRecordsInfinite(
+  orgSlug: string,
+  projectSlug: string,
+  schemaSlug: string,
+  size = 20
+) {
+  return useInfiniteQuery({
+    queryKey: ['records', orgSlug, projectSlug, schemaSlug],
+
+    // fetch function (called automatically)
+    queryFn: ({ pageParam = 0 }) =>
+      recordsApi.getAll(orgSlug, projectSlug, schemaSlug, pageParam, size),
+
+    // decide next page
+    getNextPageParam: (lastPage) => {
+      const nextPage = lastPage.page + 1;
+
+      // if more pages exist → return next page
+      // else → stop infinite scroll
+      return nextPage < lastPage.totalPages
+        ? nextPage
+        : undefined;
+    },
+
+    // prevent API calls if params missing
+    enabled: !!orgSlug && !!projectSlug && !!schemaSlug,
+    initialPageParam: 0,
+  });
+}
 
 export function useRecords(
   orgSlug: string,
