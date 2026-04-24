@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DialogFooter, DialogHeader } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCreateRecord, useDeleteRecord } from '@/hooks/use-records';
+import { useCreateRecord, useDeleteRecord, useRecordsInfinite } from '@/hooks/use-records';
 import { useSchema } from '@/hooks/use-schemas';
 import { formatRelativeTime } from '@/lib/utils';
 import {
@@ -22,9 +22,10 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useSchemaStats } from '@/hooks/use-DashboardStats';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 
 export const Route = createFileRoute('/_protected/_schemas/$orgSlug/$projectSlug/$schemaSlug')({
   component: SchemaDetail,
@@ -39,6 +40,41 @@ function SchemaDetail() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [recordData, setRecordData] = useState('{}');
+
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const {
+    data: recordsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useRecordsInfinite(orgSlug, projectSlug, schemaSlug);
+
+  const records = recordsData?.pages.flatMap((page) => page.data) ?? [];
+  
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+
+        // trigger when element is visible
+        if (
+          first.isIntersecting &&
+          hasNextPage &&
+          !isFetchingNextPage
+        ) {
+          fetchNextPage();    // load next page
+        }
+      },
+      { rootMargin: '200px' }  // trigger BEFORE reaching bottom
+    );
+
+    observer.observe(el);
+
+    return () => observer.unobserve(el);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleCreateRecord = async () => {
     try {
@@ -220,45 +256,61 @@ function SchemaDetail() {
         </CardContent>
       </Card>
 
-      {/* Recent Records */}
+      {/* All Records */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Records</CardTitle>
+          <CardTitle>All Records</CardTitle>
         </CardHeader>
+
         <CardContent>
-          {schema.recentRecords && schema.recentRecords.length > 0 ? (
-            <div className="space-y-4">
-              {schema.recentRecords.map((record) => (
-                <div key={record.id} className="border rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      {record.expired ? (
-                        <span className="text-xs text-red-600">Expired</span>
-                      ) : (
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      )}
-                      <span className="text-xs text-muted-foreground">
-                        ID: {record.id}
-                      </span>
+          {records.length > 0 ? (
+            <>
+              <div className="space-y-4">
+                {records.map((record) => (
+                  <div key={record.id} className="border rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {record.expired ? (
+                          <span className="text-xs text-red-600">Expired</span>
+                        ) : (
+                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        )}
+                        <span className="text-xs text-muted-foreground">
+                          ID: {record.id}
+                        </span>
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteRecord(record.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteRecord(record.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+
+                    <pre className="bg-muted p-2 rounded text-xs overflow-auto">
+                      {JSON.stringify(record.data, null, 2)}
+                    </pre>
+
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Created {formatRelativeTime(record.createdAt)} • Expires{' '}
+                      {formatRelativeTime(record.expiresAt)}
+                    </p>
                   </div>
-                  <pre className="bg-muted p-2 rounded text-xs overflow-auto">
-                    {JSON.stringify(record.data, null, 2)}
-                  </pre>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Created {formatRelativeTime(record.createdAt)} • Expires{' '}
-                    {formatRelativeTime(record.expiresAt)}
-                  </p>
+                ))}
+              </div>
+
+              {/* Infinite scroll trigger */}
+              {hasNextPage && <div ref={loadMoreRef} />}
+
+              {/* Loader */}
+              {isFetchingNextPage && (
+                <div className="flex justify-center py-4">
+                  <LoadingSpinner />
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-8">
               <Database className="h-12 w-12 text-muted-foreground mx-auto mb-2" />

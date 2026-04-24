@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
-  useOrganizations,
   useCreateOrganization,
   useDeleteOrganization,
+  useOrganizationsInfinite,
 } from '@/hooks/use-organizations';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -35,8 +35,49 @@ export const Route = createFileRoute('/_protected/organizations/')({
 });
 
 export function OrganizationsPage() {
-  const { data: organizations, isLoading } = useOrganizations();
-  console.log(organizations);
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useOrganizationsInfinite();
+
+  // flatten pages
+  const organizations =
+    data?.pages.flatMap((page) => page.data) ?? [];
+
+  // observer ref
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+
+        if (
+          first.isIntersecting &&
+          hasNextPage &&
+          !isFetchingNextPage
+        ) {
+          fetchNextPage();
+        }
+      },
+      {
+        rootMargin: '200px', // preload before reaching bottom
+      }
+    );
+
+    observer.observe(el);
+
+    return () => {
+      observer.unobserve(el);
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   const createMutation = useCreateOrganization();
   const deleteMutation = useDeleteOrganization();
 
@@ -85,14 +126,19 @@ export function OrganizationsPage() {
           Back to Dashboard
         </Button>
       </Link>
+
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Organizations</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Organizations
+          </h1>
           <p className="text-muted-foreground">
             Manage your organizations and their projects
           </p>
         </div>
 
+        {/* Create Dialog */}
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -100,6 +146,7 @@ export function OrganizationsPage() {
               New Organization
             </Button>
           </DialogTrigger>
+
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create Organization</DialogTitle>
@@ -107,6 +154,7 @@ export function OrganizationsPage() {
                 Add a new organization to manage your mock APIs
               </DialogDescription>
             </DialogHeader>
+
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Organization Name</Label>
@@ -118,80 +166,95 @@ export function OrganizationsPage() {
                 />
               </div>
             </div>
+
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+              >
                 Cancel
               </Button>
+
               <Button
                 onClick={handleCreate}
                 disabled={createMutation.isPending}
               >
-                {createMutation.isPending ? 'Creating...' : 'Create'}
+                {createMutation.isPending
+                  ? 'Creating...'
+                  : 'Create'}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-4 w-24 mt-2" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 w-full" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : organizations && organizations.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {organizations.map((org) => (
-            <Card key={org.id} className="relative group">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <Link
-                    to="/organizations/$orgSlug"
-                    params={{ orgSlug: org.slug }}
-                    className="flex-1"
-                  >
-                    <CardTitle className="hover:text-primary transition-colors">
-                      {org.name}
-                    </CardTitle>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleDelete(org.slug, org.name)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                <CardDescription>
-                  <div className="flex items-center gap-2">
-                    <FolderKanban className="h-3 w-3" />
-                    {org.projectCount}{' '}
-                    {org.projectCount === 1 ? 'project' : 'projects'}
+      {/* List */}
+      {organizations.length > 0 ? (
+        <>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {organizations.map((org) => (
+              <Card key={org.id} className="relative group">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <Link
+                      to="/organizations/$orgSlug"
+                      params={{ orgSlug: org.slug }}
+                      className="flex-1"
+                    >
+                      <CardTitle className="hover:text-primary transition-colors">
+                        {org.name}
+                      </CardTitle>
+                    </Link>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() =>
+                        handleDelete(org.slug, org.name)
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs text-muted-foreground">
-                  Created {formatRelativeTime(org.createdAt)}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+
+                  <CardDescription>
+                    <div className="flex items-center gap-2">
+                      <FolderKanban className="h-3 w-3" />
+                      {org.projectCount}{' '}
+                      {org.projectCount === 1
+                        ? 'project'
+                        : 'projects'}
+                    </div>
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                  <p className="text-xs text-muted-foreground">
+                    Created {formatRelativeTime(org.createdAt)}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* sentinel only when more pages exist */}
+          {hasNextPage && <div ref={loadMoreRef} />}
+
+          {/* loading indicator */}
+          {isFetchingNextPage && (
+            <div className="flex justify-center py-4">
+              <LoadingSpinner />
+            </div>
+          )}
+        </>
       ) : (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <Building2 className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No organizations yet</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              No organizations yet
+            </h3>
             <p className="text-muted-foreground text-center mb-6">
               Get started by creating your first organization
             </p>

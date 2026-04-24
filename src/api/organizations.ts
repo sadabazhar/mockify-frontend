@@ -1,10 +1,13 @@
 import { apiClient as api } from '@/api/client';
-import type { Organization, OrganizationDetail } from '@/api/types';
+import type { Organization, OrganizationDetail, PaginatedResponse } from '@/api/types';
 import type { OrganizationInput } from '@/lib/validations';
 
 export const organizationsApi = {
-  getAll: async (): Promise<Organization[]> => {
-    const response = await api.get<Organization[]>('/organizations');
+  getAll: async (page = 0, size = 20): Promise<PaginatedResponse<Organization>> => {
+    const response = await api.get<PaginatedResponse<Organization>>('/organizations', {
+      params: { page, size }, // query params -> ?page=0&size=20
+    });
+
     return response.data;
   },
 
