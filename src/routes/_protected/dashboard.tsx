@@ -25,11 +25,11 @@ export const Route = createFileRoute('/_protected/dashboard')({
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const { data: organizations, isLoading } = useOrganizations();
+  const { data: orgResponse, isLoading } = useOrganizations();
+  const organizations = orgResponse?.data || [];
   const { data: userStats, isLoading: isUserStatsLoading, error } = useUserStats();
   console.log("User stats: ", userStats);
   console.log("Error: ", error);
-  console.log(organizations);
 
   if (isLoading || isUserStatsLoading) {
     return <LoadingSpinner fullScreen />;

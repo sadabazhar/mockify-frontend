@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { MockRecord } from './types';
+import type { MockRecord, PaginatedResponse } from './types';
 
 export const recordsApi = {
   create: async (
@@ -20,11 +20,17 @@ export const recordsApi = {
   getAll: async (
     orgSlug: string,
     projectSlug: string,
-    schemaSlug: string
-  ): Promise<MockRecord[]> => {
-    const response = await apiClient.get<MockRecord[]>(
+    schemaSlug: string,
+    page = 0,
+    size = 20
+  ): Promise<PaginatedResponse<MockRecord>> => {
+    const response = await apiClient.get<PaginatedResponse<MockRecord>>(
       `/${orgSlug}/${projectSlug}/${schemaSlug}/records`,
+      {
+        params: { page, size }, // query params -> ?page=0&size=20
+      }
     );
+
     return response.data;
   },
 

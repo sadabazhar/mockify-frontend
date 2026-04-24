@@ -1,12 +1,33 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { organizationsApi } from '@/api/organizations';
 import type { OrganizationInput } from '@/lib/validations';
 
-export function useOrganizations() {
+export function useOrganizations(page = 0, size = 20) {
   return useQuery({
+    queryKey: ['organizations', page, size],
+    queryFn: () => organizationsApi.getAll(page, size),
+  });
+}
+
+export function useOrganizationsInfinite(size = 20) {
+  return useInfiniteQuery({
     queryKey: ['organizations'],
-    queryFn: organizationsApi.getAll,
+
+    // called every time we fetch a page
+    queryFn: ({ pageParam = 0 }) =>
+      organizationsApi.getAll(pageParam, size),
+
+    // decides next page
+    getNextPageParam: (lastPage) => {
+      const nextPage = lastPage.page + 1;
+
+      return nextPage < lastPage.totalPages
+        ? nextPage
+        : undefined; // no more pages
+    },
+
+    initialPageParam: 0,
   });
 }
 
