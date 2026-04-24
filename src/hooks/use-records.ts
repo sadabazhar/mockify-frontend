@@ -137,6 +137,9 @@ export function useDeleteRecord(
 
     onSuccess: () => {
       queryClient.invalidateQueries({
+        queryKey: ['records', orgSlug, projectSlug, schemaSlug],
+      });
+      queryClient.invalidateQueries({
         queryKey: ['schemas', orgSlug, projectSlug, schemaSlug],
       });
       queryClient.invalidateQueries({
