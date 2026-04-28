@@ -49,7 +49,6 @@ export interface OrganizationDetail {
   projects: ProjectSummary[];
 }
 
-
 export interface ProjectSummary {
   id: string;
   name: string;
@@ -82,7 +81,6 @@ export interface ProjectDetail {
   schemas: MockSchemaSummary[];
   stats: ProjectStats;
 }
-
 
 export interface ProjectStats {
   totalSchemas: number;
@@ -201,4 +199,25 @@ export interface PaginatedResponse<T> {
   size: number;
   totalElements: number;
   totalPages: number;
+}
+
+export type MemberRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
+
+export interface MemberResponse {
+  id: string; // member-record UUID
+  userId: string; // user UUID
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  role: MemberRole;
+  joinedAt: string;
+}
+
+export interface InvitationResponse {
+  id: string;
+  email: string;
+  role: MemberRole;
+  invitedByName: string;
+  expiresAt: string;
+  createdAt: string;
 }
