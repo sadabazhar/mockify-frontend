@@ -47,6 +47,7 @@ export interface OrganizationDetail {
   owner: User;
   createdAt: string;
   projects: ProjectSummary[];
+  userRole?: MemberRole;
 }
 
 export interface ProjectSummary {

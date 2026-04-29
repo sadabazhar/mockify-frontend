@@ -22,6 +22,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-pass
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as ProtectedOrganizationsIndexRouteImport } from './routes/_protected/organizations/index'
+import { Route as PublicInvitationsAcceptRouteImport } from './routes/_public/invitations/accept'
 import { Route as ProtectedOrganizationsOrgSlugRouteImport } from './routes/_protected/organizations/$orgSlug'
 import { Route as ProtectedProjectsOrgSlugProjectSlugRouteImport } from './routes/_protected/_projects/$orgSlug/$projectSlug'
 import { Route as ProtectedSchemasOrgSlugProjectSlugSchemaSlugRouteImport } from './routes/_protected/_schemas/$orgSlug/$projectSlug/$schemaSlug'
@@ -89,6 +90,11 @@ const ProtectedOrganizationsIndexRoute =
     path: '/organizations/',
     getParentRoute: () => ProtectedRouteRoute,
   } as any)
+const PublicInvitationsAcceptRoute = PublicInvitationsAcceptRouteImport.update({
+  id: '/invitations/accept',
+  path: '/invitations/accept',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const ProtectedOrganizationsOrgSlugRoute =
   ProtectedOrganizationsOrgSlugRouteImport.update({
     id: '/organizations/$orgSlug',
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/oauth2/redirect': typeof Oauth2RedirectRoute
   '/': typeof PublicIndexRoute
   '/organizations/$orgSlug': typeof ProtectedOrganizationsOrgSlugRoute
+  '/invitations/accept': typeof PublicInvitationsAcceptRoute
   '/organizations': typeof ProtectedOrganizationsIndexRoute
   '/$orgSlug/$projectSlug': typeof ProtectedProjectsOrgSlugProjectSlugRoute
   '/$orgSlug/$projectSlug/$schemaSlug': typeof ProtectedSchemasOrgSlugProjectSlugSchemaSlugRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/oauth2/redirect': typeof Oauth2RedirectRoute
   '/': typeof PublicIndexRoute
   '/organizations/$orgSlug': typeof ProtectedOrganizationsOrgSlugRoute
+  '/invitations/accept': typeof PublicInvitationsAcceptRoute
   '/organizations': typeof ProtectedOrganizationsIndexRoute
   '/$orgSlug/$projectSlug': typeof ProtectedProjectsOrgSlugProjectSlugRoute
   '/$orgSlug/$projectSlug/$schemaSlug': typeof ProtectedSchemasOrgSlugProjectSlugSchemaSlugRoute
@@ -153,6 +161,7 @@ export interface FileRoutesById {
   '/oauth2/redirect': typeof Oauth2RedirectRoute
   '/_public/': typeof PublicIndexRoute
   '/_protected/organizations/$orgSlug': typeof ProtectedOrganizationsOrgSlugRoute
+  '/_public/invitations/accept': typeof PublicInvitationsAcceptRoute
   '/_protected/organizations/': typeof ProtectedOrganizationsIndexRoute
   '/_protected/_projects/$orgSlug/$projectSlug': typeof ProtectedProjectsOrgSlugProjectSlugRoute
   '/_protected/_schemas/$orgSlug/$projectSlug/$schemaSlug': typeof ProtectedSchemasOrgSlugProjectSlugSchemaSlugRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/oauth2/redirect'
     | '/'
     | '/organizations/$orgSlug'
+    | '/invitations/accept'
     | '/organizations'
     | '/$orgSlug/$projectSlug'
     | '/$orgSlug/$projectSlug/$schemaSlug'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/oauth2/redirect'
     | '/'
     | '/organizations/$orgSlug'
+    | '/invitations/accept'
     | '/organizations'
     | '/$orgSlug/$projectSlug'
     | '/$orgSlug/$projectSlug/$schemaSlug'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/oauth2/redirect'
     | '/_public/'
     | '/_protected/organizations/$orgSlug'
+    | '/_public/invitations/accept'
     | '/_protected/organizations/'
     | '/_protected/_projects/$orgSlug/$projectSlug'
     | '/_protected/_schemas/$orgSlug/$projectSlug/$schemaSlug'
@@ -309,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedOrganizationsIndexRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
+    '/_public/invitations/accept': {
+      id: '/_public/invitations/accept'
+      path: '/invitations/accept'
+      fullPath: '/invitations/accept'
+      preLoaderRoute: typeof PublicInvitationsAcceptRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/_protected/organizations/$orgSlug': {
       id: '/_protected/organizations/$orgSlug'
       path: '/organizations/$orgSlug'
@@ -375,12 +394,14 @@ interface PublicRouteRouteChildren {
   PublicDocsRoute: typeof PublicDocsRoute
   PublicVerifyEmailRoute: typeof PublicVerifyEmailRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicInvitationsAcceptRoute: typeof PublicInvitationsAcceptRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicDocsRoute: PublicDocsRoute,
   PublicVerifyEmailRoute: PublicVerifyEmailRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicInvitationsAcceptRoute: PublicInvitationsAcceptRoute,
 }
 
 const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
