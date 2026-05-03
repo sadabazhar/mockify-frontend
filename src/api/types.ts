@@ -110,6 +110,17 @@ export interface MockSchema {
   endpointUrl: string;
 }
 
+export interface SchemaTemplate {
+  schema: {};
+  category: string | undefined;
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  schemaJson: Record<string, object>;
+  createdAt: string;
+}
+
 export interface MockSchemaDetail {
   id: string;
   name: string;
@@ -174,19 +185,6 @@ export interface OrganizationStats {
   recordCount: number;
 }
 
-export interface ProjectStats {
-  schemaCount: number;
-  recordCount: number;
-  activeRecords: number;
-  expiredRecords: number;
-}
-
-export interface SchemaStats {
-  recordCount: number;
-  activeRecords: number;
-  expiredRecords: number;
-  expiringSoonRecords: number;
-}
 
 export interface RecordHealthStats {
   totalRecords: number;
@@ -194,11 +192,10 @@ export interface RecordHealthStats {
   totalExpiredRecords: number;
   totalExpiringSoonRecords: number;
 }
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  page: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
+export interface ApplyTemplateResponse {
+  schemaId: string;
+  name: string;
+  schemaSlug: string;
+  projectId: string;
+  message: string;
 }

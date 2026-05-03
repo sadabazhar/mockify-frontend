@@ -17,7 +17,7 @@ export const useOrganizationStats = (orgId: string) => {
     });
 };
 
-export const useProjectStats = (projectId: string) => {
+export const useProjectStats = (projectId: string | undefined) => {
     return useQuery({
         queryKey: ['dashboard', 'project', projectId],
         queryFn: () => dashboardApi.getProjectStats(projectId),

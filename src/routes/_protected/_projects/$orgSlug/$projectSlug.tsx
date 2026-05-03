@@ -34,6 +34,7 @@ import {
 import { toast } from 'sonner';
 import { formatRelativeTime } from '@/lib/utils';
 import { useProjectStats } from '@/hooks/use-DashboardStats';
+import { SchemaTemplatesBrowser } from '@/components/ui/schema-templates-Browser';
 
 export const Route = createFileRoute('/_protected/_projects/$orgSlug/$projectSlug')({
   component: ProjectDetail,
@@ -143,7 +144,9 @@ function ProjectDetail() {
             </p>
           </div>
 
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+          <div className="flex items-center gap-2">
+            <SchemaTemplatesBrowser orgSlug={orgSlug} projectSlug={projectSlug} />
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
@@ -196,6 +199,7 @@ function ProjectDetail() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
       </div>
 
