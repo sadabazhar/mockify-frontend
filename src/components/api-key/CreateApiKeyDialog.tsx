@@ -39,12 +39,17 @@ import type {
 const createKeySchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   description: z.string().max(255).optional(),
-  rateLimitPerMinute: z
+  rateLimitPerMinute: z.coerce
     .number()
-    .int()
+    .int('Must be a whole number')
     .min(1, 'Min 1')
     .max(100_000, 'Max 100 000'),
-  expiresAt: z.string().optional(),
+  expiresAt: z
+    .string()
+    .optional()
+    .refine((val) => !val || new Date(val) > new Date(), {
+      message: 'Expiry date must be in the future',
+    }),
 });
 
 type CreateKeyForm = z.infer<typeof createKeySchema>;
@@ -433,7 +438,11 @@ export function CreateApiKeyDialog({
                           </span>
                         </FormLabel>
                         <FormControl>
-                          <Input type="datetime-local" {...field} />
+                          <Input
+                            type="datetime-local"
+                            min={new Date().toISOString().split('T')[0]}
+                            {...field}
+                          />
                         </FormControl>
                         <FormDescription className="text-xs">
                           Blank = never expires

@@ -163,10 +163,13 @@ function ApiKeysPage() {
   // Derived stats
   const now = new Date();
   const expired = keys.filter(
-    (k) => k.expiresAt && new Date(k.expiresAt) < now,
+    (k) => k.active && k.expiresAt && new Date(k.expiresAt) < now,
   ).length;
   const revoked = keys.filter((k) => !k.active).length;
-  const active = keys.length - revoked - expired;
+  const active = keys.filter(
+    (k) => k.active && !(k.expiresAt && new Date(k.expiresAt) < now),
+  ).length;
+
   const orgWide = keys.filter((k) => !k.projectId).length;
   const projectScoped = keys.filter((k) => !!k.projectId).length;
 
