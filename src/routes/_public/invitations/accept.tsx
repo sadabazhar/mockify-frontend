@@ -1,8 +1,4 @@
-import {
-  createFileRoute,
-  useNavigate,
-  useSearch,
-} from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 import { membersApi } from '@/api/members';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,7 +13,7 @@ export const Route = createFileRoute('/_public/invitations/accept')({
 });
 
 function AcceptInvitationPage() {
-  const { token } = useSearch({ from: '/invitations/accept' });
+  const { token } = Route.useSearch();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const ran = useRef(false);
