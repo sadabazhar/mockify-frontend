@@ -16,11 +16,11 @@ import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as Oauth2RedirectRouteImport } from './routes/oauth2/redirect'
 import { Route as PublicVerifyEmailRouteImport } from './routes/_public/verify-email'
-import { Route as PublicDocsRouteImport } from './routes/_public/docs'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as PublicDocsIndexRouteImport } from './routes/_public/docs/index'
 import { Route as ProtectedOrganizationsIndexRouteImport } from './routes/_protected/organizations/index'
 import { Route as PublicInvitationsAcceptRouteImport } from './routes/_public/invitations/accept'
 import { Route as ProtectedOrganizationsOrgSlugRouteImport } from './routes/_protected/organizations/$orgSlug'
@@ -59,11 +59,6 @@ const PublicVerifyEmailRoute = PublicVerifyEmailRouteImport.update({
   path: '/verify-email',
   getParentRoute: () => PublicRouteRoute,
 } as any)
-const PublicDocsRoute = PublicDocsRouteImport.update({
-  id: '/docs',
-  path: '/docs',
-  getParentRoute: () => PublicRouteRoute,
-} as any)
 const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -83,6 +78,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthRouteRoute,
+} as any)
+const PublicDocsIndexRoute = PublicDocsIndexRouteImport.update({
+  id: '/docs/',
+  path: '/docs/',
+  getParentRoute: () => PublicRouteRoute,
 } as any)
 const ProtectedOrganizationsIndexRoute =
   ProtectedOrganizationsIndexRouteImport.update({
@@ -120,13 +120,13 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/dashboard': typeof ProtectedDashboardRoute
-  '/docs': typeof PublicDocsRoute
   '/verify-email': typeof PublicVerifyEmailRoute
   '/oauth2/redirect': typeof Oauth2RedirectRoute
   '/': typeof PublicIndexRoute
   '/organizations/$orgSlug': typeof ProtectedOrganizationsOrgSlugRoute
   '/invitations/accept': typeof PublicInvitationsAcceptRoute
   '/organizations': typeof ProtectedOrganizationsIndexRoute
+  '/docs': typeof PublicDocsIndexRoute
   '/$orgSlug/$projectSlug': typeof ProtectedProjectsOrgSlugProjectSlugRoute
   '/$orgSlug/$projectSlug/$schemaSlug': typeof ProtectedSchemasOrgSlugProjectSlugSchemaSlugRoute
 }
@@ -136,13 +136,13 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/dashboard': typeof ProtectedDashboardRoute
-  '/docs': typeof PublicDocsRoute
   '/verify-email': typeof PublicVerifyEmailRoute
   '/oauth2/redirect': typeof Oauth2RedirectRoute
   '/': typeof PublicIndexRoute
   '/organizations/$orgSlug': typeof ProtectedOrganizationsOrgSlugRoute
   '/invitations/accept': typeof PublicInvitationsAcceptRoute
   '/organizations': typeof ProtectedOrganizationsIndexRoute
+  '/docs': typeof PublicDocsIndexRoute
   '/$orgSlug/$projectSlug': typeof ProtectedProjectsOrgSlugProjectSlugRoute
   '/$orgSlug/$projectSlug/$schemaSlug': typeof ProtectedSchemasOrgSlugProjectSlugSchemaSlugRoute
 }
@@ -156,13 +156,13 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
-  '/_public/docs': typeof PublicDocsRoute
   '/_public/verify-email': typeof PublicVerifyEmailRoute
   '/oauth2/redirect': typeof Oauth2RedirectRoute
   '/_public/': typeof PublicIndexRoute
   '/_protected/organizations/$orgSlug': typeof ProtectedOrganizationsOrgSlugRoute
   '/_public/invitations/accept': typeof PublicInvitationsAcceptRoute
   '/_protected/organizations/': typeof ProtectedOrganizationsIndexRoute
+  '/_public/docs/': typeof PublicDocsIndexRoute
   '/_protected/_projects/$orgSlug/$projectSlug': typeof ProtectedProjectsOrgSlugProjectSlugRoute
   '/_protected/_schemas/$orgSlug/$projectSlug/$schemaSlug': typeof ProtectedSchemasOrgSlugProjectSlugSchemaSlugRoute
 }
@@ -174,13 +174,13 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/dashboard'
-    | '/docs'
     | '/verify-email'
     | '/oauth2/redirect'
     | '/'
     | '/organizations/$orgSlug'
     | '/invitations/accept'
     | '/organizations'
+    | '/docs'
     | '/$orgSlug/$projectSlug'
     | '/$orgSlug/$projectSlug/$schemaSlug'
   fileRoutesByTo: FileRoutesByTo
@@ -190,13 +190,13 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/dashboard'
-    | '/docs'
     | '/verify-email'
     | '/oauth2/redirect'
     | '/'
     | '/organizations/$orgSlug'
     | '/invitations/accept'
     | '/organizations'
+    | '/docs'
     | '/$orgSlug/$projectSlug'
     | '/$orgSlug/$projectSlug/$schemaSlug'
   id:
@@ -209,13 +209,13 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/_auth/reset-password'
     | '/_protected/dashboard'
-    | '/_public/docs'
     | '/_public/verify-email'
     | '/oauth2/redirect'
     | '/_public/'
     | '/_protected/organizations/$orgSlug'
     | '/_public/invitations/accept'
     | '/_protected/organizations/'
+    | '/_public/docs/'
     | '/_protected/_projects/$orgSlug/$projectSlug'
     | '/_protected/_schemas/$orgSlug/$projectSlug/$schemaSlug'
   fileRoutesById: FileRoutesById
@@ -279,13 +279,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicVerifyEmailRouteImport
       parentRoute: typeof PublicRouteRoute
     }
-    '/_public/docs': {
-      id: '/_public/docs'
-      path: '/docs'
-      fullPath: '/docs'
-      preLoaderRoute: typeof PublicDocsRouteImport
-      parentRoute: typeof PublicRouteRoute
-    }
     '/_protected/dashboard': {
       id: '/_protected/dashboard'
       path: '/dashboard'
@@ -313,6 +306,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRouteRoute
+    }
+    '/_public/docs/': {
+      id: '/_public/docs/'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof PublicDocsIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
     '/_protected/organizations/': {
       id: '/_protected/organizations/'
@@ -391,17 +391,17 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 )
 
 interface PublicRouteRouteChildren {
-  PublicDocsRoute: typeof PublicDocsRoute
   PublicVerifyEmailRoute: typeof PublicVerifyEmailRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicInvitationsAcceptRoute: typeof PublicInvitationsAcceptRoute
+  PublicDocsIndexRoute: typeof PublicDocsIndexRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
-  PublicDocsRoute: PublicDocsRoute,
   PublicVerifyEmailRoute: PublicVerifyEmailRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicInvitationsAcceptRoute: PublicInvitationsAcceptRoute,
+  PublicDocsIndexRoute: PublicDocsIndexRoute,
 }
 
 const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
