@@ -185,6 +185,20 @@ export interface OrganizationStats {
   recordCount: number;
 }
 
+export interface ProjectStats {
+  schemaCount: number;
+  recordCount: number;
+  activeRecords: number;
+  expiredRecords: number;
+}
+
+export interface SchemaStats {
+  recordCount: number;
+  activeRecords: number;
+  expiredRecords: number;
+  expiringSoonRecords: number;
+}
+
 
 export interface RecordHealthStats {
   totalRecords: number;
@@ -198,4 +212,12 @@ export interface ApplyTemplateResponse {
   schemaSlug: string;
   projectId: string;
   message: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
 }
