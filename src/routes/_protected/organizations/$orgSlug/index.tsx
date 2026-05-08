@@ -26,8 +26,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, FolderKanban, Database, Trash2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatRelativeTime } from '@/lib/utils';
+import { Key } from 'lucide-react';
 
-export const Route = createFileRoute('/_protected/organizations/$orgSlug')({
+export const Route = createFileRoute('/_protected/organizations/$orgSlug/')({
   component: OrganizationDetail,
 });
 
@@ -47,16 +48,13 @@ export function OrganizationDetail() {
     }
 
     await createProjectMutation.mutateAsync({
-      name: projectName ,
+      name: projectName,
     });
     setProjectName('');
     setIsCreateOpen(false);
   };
 
-  const handleDeleteProject = async (
-    projectSlug: string,
-    name: string,
-  ) => {
+  const handleDeleteProject = async (projectSlug: string, name: string) => {
     if (confirm(`Are you sure you want to delete "${name}"?`)) {
       await deleteProjectMutation.mutateAsync(projectSlug);
     }
@@ -98,58 +96,68 @@ export function OrganizationDetail() {
           </Button>
         </Link>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
               {organization.name}
             </h1>
             <p className="text-muted-foreground">
-              Owned by {organization.owner.name} • Created{' '}
+              Owned by {organization.owner.name} · Created{' '}
               {formatRelativeTime(organization.createdAt)}
             </p>
           </div>
 
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                New Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Project</DialogTitle>
-                <DialogDescription>
-                  Add a new project to {organization.name}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="projectName">Project Name</Label>
-                  <Input
-                    id="projectName"
-                    placeholder="E-commerce API"
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                  />
+          <div className="flex items-center gap-2">
+            {/* API Keys navigation — goes to /organizations/:orgSlug/api-keys */}
+            <Button variant="outline" asChild>
+              <Link to="/organizations/$orgSlug/api-keys" params={{ orgSlug }}>
+                <Key className="mr-2 h-4 w-4" />
+                API Keys
+              </Link>
+            </Button>
+
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Project</DialogTitle>
+                  <DialogDescription>
+                    Add a new project to {organization.name}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="projectName">Project Name</Label>
+                    <Input
+                      id="projectName"
+                      placeholder="E-commerce API"
+                      value={projectName}
+                      onChange={(e) => setProjectName(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsCreateOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleCreateProject}
-                  disabled={createProjectMutation.isPending}
-                >
-                  {createProjectMutation.isPending ? 'Creating...' : 'Create'}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsCreateOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCreateProject}
+                    disabled={createProjectMutation.isPending}
+                  >
+                    {createProjectMutation.isPending ? 'Creating...' : 'Create'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
 
@@ -168,9 +176,9 @@ export function OrganizationDetail() {
                   <div className="flex items-start justify-between">
                     <Link
                       to="/$orgSlug/$projectSlug"
-                      params={{ 
+                      params={{
                         orgSlug: orgSlug,
-                        projectSlug: project.slug
+                        projectSlug: project.slug,
                       }}
                       className="flex-1"
                     >
