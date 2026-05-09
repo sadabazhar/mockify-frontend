@@ -1,11 +1,12 @@
 import { apiClient as api } from '@/api/client';
-import type { Project, ProjectDetail } from '@/api/types';
+import type { PaginatedResponse, Project, ProjectDetail } from '@/api/types';
 
 export const projectsApi = {
-  getAllByOrg: async (orgSlug: string): Promise<Project[]> => {
-    const response = await api.get(`/${orgSlug}/projects`);
-    return response.data;
-  },
+ getAllByOrg: async (orgSlug: string): Promise<Project[]> => {
+  const response = await api.get<PaginatedResponse<Project>>(`/${orgSlug}/projects`);
+  const { data: projects } = response.data;
+  return projects;
+ },
 
   getBySlug: async (
     orgSlug: string, projectSlug: string

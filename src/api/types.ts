@@ -109,6 +109,17 @@ export interface MockSchema {
   endpointUrl: string;
 }
 
+export interface SchemaTemplate {
+  schema: {};
+  category: string | undefined;
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  schemaJson: Record<string, object>;
+  createdAt: string;
+}
+
 export interface MockSchemaDetail {
   id: string;
   name: string;
@@ -193,6 +204,13 @@ export interface RecordHealthStats {
   totalExpiredRecords: number;
   totalExpiringSoonRecords: number;
 }
+export interface ApplyTemplateResponse {
+  schemaId: string;
+  name: string;
+  schemaSlug: string;
+  projectId: string;
+  message: string;
+}
 
 export interface PaginatedResponse<T> {
   data: T[];
@@ -200,6 +218,115 @@ export interface PaginatedResponse<T> {
   size: number;
   totalElements: number;
   totalPages: number;
+}
+
+// API KEY TYPES
+
+/**
+ * Hierarchical permission levels.
+ * Server enforces: ADMIN ≥ DELETE ≥ WRITE ≥ READ
+ */
+export type ApiPermission = 'READ' | 'WRITE' | 'DELETE' | 'ADMIN';
+
+/** Resource types that can be targeted by a permission grant */
+export type ApiResourceType = 'ORGANIZATION' | 'PROJECT' | 'SCHEMA' | 'RECORD';
+
+/**
+ * Permission entry
+ */
+export interface ApiKeyPermissionEntry {
+  id: string;
+
+  resourceType: ApiResourceType;
+  resourceName?: string;
+
+  permission: ApiPermission;
+
+  /** Undefined/null = wildcard (all resources of this type) */
+  resourceId?: string;
+}
+
+/**
+ * Represents a persisted API key
+ */
+export interface ApiKeyResponse {
+  id: string;
+  name: string;
+  description?: string;
+
+  /** Visible prefix shown in the UI */
+  keyPrefix: string;
+
+  organizationId: string;
+  organizationName: string;
+
+  /** Set = project-scoped; null = org-wide */
+  projectId?: string;
+  projectName?: string;
+
+  createdBy: string;
+  createdByName: string;
+
+  permissions: ApiKeyPermissionEntry[];
+
+  rateLimitPerMinute: number;
+
+  /** false after revocation */
+  active: boolean;
+
+  /** ISO-8601 datetime; absent = never expires */
+  expiresAt?: string;
+
+  /** ISO-8601 datetime */
+  lastUsedAt?: string;
+
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/**
+ * Returned only by the create and rotate endpoints.
+ * `apiKey` is the ONLY time the full secret is exposed.
+ */
+export interface CreateApiKeyResult {
+  apiKey: string;
+  keyInfo: ApiKeyResponse;
+
+  /** Informational message from backend */
+  securityNotice?: string;
+}
+
+export interface CreateApiKeyRequest {
+  name: string;
+  description?: string;
+
+  /** UUID of the project to scope this key to (omit for org-wide) */
+  projectId?: string;
+
+  /** ISO-8601 future datetime */
+  expiresAt?: string;
+
+  /** Default: 1000 */
+  rateLimitPerMinute?: number;
+
+  permissions: {
+    permission: ApiPermission;
+    resourceType: ApiResourceType;
+    resourceId?: string;
+  }[];
+}
+
+export interface UpdateApiKeyRequest {
+  name?: string;
+  description?: string;
+
+  rateLimitPerMinute?: number;
+
+  /** Activate/deactivate key */
+  active?: boolean;
+
+  /** Update expiry */
+  expiresAt?: string;
 }
 
 export type MemberRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';

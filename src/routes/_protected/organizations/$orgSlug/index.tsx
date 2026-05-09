@@ -26,11 +26,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, FolderKanban, Database, Trash2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatRelativeTime } from '@/lib/utils';
+import { Key } from 'lucide-react';
 import { MembersTab } from '@/components/members/MembersTab';
 import type { MemberRole } from '@/api/types';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/_protected/organizations/$orgSlug')({
+export const Route = createFileRoute('/_protected/organizations/$orgSlug/')({
   component: OrganizationDetail,
 });
 
@@ -121,58 +122,68 @@ export function OrganizationDetail() {
           </Button>
         </Link>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
               {organization.name}
             </h1>
             <p className="text-muted-foreground">
-              Owned by {organization.owner.name} • Created{' '}
+              Owned by {organization.owner.name} · Created{' '}
               {formatRelativeTime(organization.createdAt)}
             </p>
           </div>
 
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                New Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Project</DialogTitle>
-                <DialogDescription>
-                  Add a new project to {organization.name}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="projectName">Project Name</Label>
-                  <Input
-                    id="projectName"
-                    placeholder="E-commerce API"
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                  />
+          <div className="flex items-center gap-2">
+            {/* API Keys navigation — goes to /organizations/:orgSlug/api-keys */}
+            <Button variant="outline" asChild>
+              <Link to="/organizations/$orgSlug/api-keys" params={{ orgSlug }}>
+                <Key className="mr-2 h-4 w-4" />
+                API Keys
+              </Link>
+            </Button>
+
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Project</DialogTitle>
+                  <DialogDescription>
+                    Add a new project to {organization.name}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="projectName">Project Name</Label>
+                    <Input
+                      id="projectName"
+                      placeholder="E-commerce API"
+                      value={projectName}
+                      onChange={(e) => setProjectName(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsCreateOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleCreateProject}
-                  disabled={createProjectMutation.isPending}
-                >
-                  {createProjectMutation.isPending ? 'Creating...' : 'Create'}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsCreateOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCreateProject}
+                    disabled={createProjectMutation.isPending}
+                  >
+                    {createProjectMutation.isPending ? 'Creating...' : 'Create'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
 
@@ -267,6 +278,70 @@ export function OrganizationDetail() {
       {activeTab === 'members' && (
         <MembersTab orgSlug={orgSlug} userRole={userRole} />
       )}
+        {organization.projects && organization.projects.length > 0 ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {organization.projects.map((project) => (
+              <Card
+                key={project.id}
+                className="relative group hover:shadow-md transition-shadow"
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <Link
+                      to="/$orgSlug/$projectSlug"
+                      params={{
+                        orgSlug: orgSlug,
+                        projectSlug: project.slug,
+                      }}
+                      className="flex-1"
+                    >
+                      <CardTitle className="hover:text-primary transition-colors">
+                        {project.name}
+                      </CardTitle>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() =>
+                        handleDeleteProject(project.slug, project.name)
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <CardDescription>
+                    <div className="flex items-center gap-2">
+                      <Database className="h-3 w-3" />
+                      {project.schemaCount}{' '}
+                      {project.schemaCount === 1 ? 'schema' : 'schemas'}
+                    </div>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xs text-muted-foreground">
+                    Created {formatRelativeTime(project.createdAt)}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <FolderKanban className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
+              <p className="text-muted-foreground text-center mb-4">
+                Create your first project to start building mock APIs
+              </p>
+              <Button onClick={() => setIsCreateOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Project
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
