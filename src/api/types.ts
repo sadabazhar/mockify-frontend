@@ -47,6 +47,7 @@ export interface OrganizationDetail {
   owner: User;
   createdAt: string;
   projects: ProjectSummary[];
+  userRole?: MemberRole;
 }
 
 export interface ProjectSummary {
@@ -197,7 +198,6 @@ export interface SchemaStats {
   expiringSoonRecords: number;
 }
 
-
 export interface RecordHealthStats {
   totalRecords: number;
   totalActiveRecords: number;
@@ -327,4 +327,25 @@ export interface UpdateApiKeyRequest {
 
   /** Update expiry */
   expiresAt?: string;
+}
+
+export type MemberRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
+
+export interface MemberResponse {
+  id: string; // member-record UUID
+  userId: string; // user UUID
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  role: MemberRole;
+  joinedAt: string;
+}
+
+export interface InvitationResponse {
+  id: string;
+  email: string;
+  role: MemberRole;
+  invitedByName: string;
+  expiresAt: string;
+  createdAt: string;
 }

@@ -27,6 +27,9 @@ import { Plus, FolderKanban, Database, Trash2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatRelativeTime } from '@/lib/utils';
 import { Key } from 'lucide-react';
+import { MembersTab } from '@/components/members/MembersTab';
+import type { MemberRole } from '@/api/types';
+import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/_protected/organizations/$orgSlug/')({
   component: OrganizationDetail,
@@ -40,6 +43,29 @@ export function OrganizationDetail() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [projectName, setProjectName] = useState('');
+
+  const [activeTab, setActiveTab] = useState<'projects' | 'members'>(
+    'projects',
+  );
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-64" />
+        {/* existing skeleton JSX */}
+      </div>
+    );
+  }
+
+  if (!organization) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Organization not found</p>
+      </div>
+    );
+  }
+
+  const userRole: MemberRole = organization.userRole ?? 'VIEWER';
 
   const handleCreateProject = async () => {
     if (!projectName.trim()) {
@@ -161,10 +187,97 @@ export function OrganizationDetail() {
         </div>
       </div>
 
-      {/* Projects */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Projects</h2>
+      <div className="flex border-b border-border/50 gap-0">
+        {(['projects', 'members'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={cn(
+              'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors capitalize',
+              activeTab === tab
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
 
+      {/* Projects */}
+      {activeTab === 'projects' && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Projects</h2>
+
+          {organization.projects && organization.projects.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {organization.projects.map((project) => (
+                <Card
+                  key={project.id}
+                  className="relative group hover:shadow-md transition-shadow"
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <Link
+                        to="/$orgSlug/$projectSlug"
+                        params={{
+                          orgSlug: orgSlug,
+                          projectSlug: project.slug,
+                        }}
+                        className="flex-1"
+                      >
+                        <CardTitle className="hover:text-primary transition-colors">
+                          {project.name}
+                        </CardTitle>
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() =>
+                          handleDeleteProject(project.slug, project.name)
+                        }
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <CardDescription>
+                      <div className="flex items-center gap-2">
+                        <Database className="h-3 w-3" />
+                        {project.schemaCount}{' '}
+                        {project.schemaCount === 1 ? 'schema' : 'schemas'}
+                      </div>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground">
+                      Created {formatRelativeTime(project.createdAt)}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <FolderKanban className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
+                <p className="text-muted-foreground text-center mb-4">
+                  Create your first project to start building mock APIs
+                </p>
+                <Button onClick={() => setIsCreateOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Project
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'members' && (
+        <MembersTab orgSlug={orgSlug} userRole={userRole} />
+      )}
         {organization.projects && organization.projects.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {organization.projects.map((project) => (
