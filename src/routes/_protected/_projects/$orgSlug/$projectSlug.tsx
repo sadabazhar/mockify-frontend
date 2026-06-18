@@ -35,6 +35,7 @@ import { toast } from 'sonner';
 import { formatRelativeTime } from '@/lib/utils';
 import { useProjectStats } from '@/hooks/use-DashboardStats';
 import { SchemaTemplatesBrowser } from '@/components/ui/schema-templates-Browser';
+import { ImportOpenApiDialog } from '@/components/ui/import-openapi-dialog';
 
 export const Route = createFileRoute('/_protected/_projects/$orgSlug/$projectSlug')({
   component: ProjectDetail,
@@ -145,7 +146,11 @@ function ProjectDetail() {
           </div>
 
           <div className="flex items-center gap-2">
+
             <SchemaTemplatesBrowser orgSlug={orgSlug} projectSlug={projectSlug} />
+
+            <ImportOpenApiDialog orgSlug={orgSlug} projectSlug={projectSlug} />
+
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
