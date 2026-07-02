@@ -92,6 +92,36 @@ export function useCreateRecord(
   });
 }
 
+export const useAutoGenerateRecords = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      orgSlug,
+      projectSlug,
+      schemaSlug,
+      count,
+    }: {
+      orgSlug: string;
+      projectSlug: string;
+      schemaSlug: string;
+      count: number;
+    }) =>
+      recordsApi.autoGenerate(
+        orgSlug,
+        projectSlug,
+        schemaSlug,
+        count,
+      ),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["records"],
+      });
+    },
+  });
+};
+
 export function useUpdateRecord(
   orgSlug: string,
   projectSlug: string,
