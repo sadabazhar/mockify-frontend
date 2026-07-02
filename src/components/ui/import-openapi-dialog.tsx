@@ -11,7 +11,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useImportOpenApi } from '@/hooks/use-open-api';
-import type { OpenApiImportResponse, SkippedComponent } from '@/api/types';
+import type { ImportedSchema, OpenApiImportResponse, SkippedComponent } from '@/api/types';
+import { toast } from 'sonner';
 
 interface ImportOpenApiDialogProps {
   orgSlug: string;
@@ -24,7 +25,9 @@ export function ImportOpenApiDialog({ orgSlug, projectSlug }: ImportOpenApiDialo
   const [isDragging, setIsDragging] = useState(false);
   const [importResult, setImportResult] = useState<OpenApiImportResponse | null>(null);
   const [isSkippedExpanded, setIsSkippedExpanded] = useState(false);
+  const [isImportedExpanded, setIsImportedExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const importMutation = useImportOpenApi();
 
@@ -39,9 +42,23 @@ export function ImportOpenApiDialog({ orgSlug, projectSlug }: ImportOpenApiDialo
   };
 
   const handleFileSelect = (file: File) => {
+
+    const MAX_SIZE = 2 * 1024 * 1024;
     const validTypes = ['.yml', '.yaml', '.json'];
     const isValid = validTypes.some((ext) => file.name.toLowerCase().endsWith(ext));
-    if (!isValid) return;
+
+    if (file.size > MAX_SIZE) {
+        toast.error("Maximum file size is 2 MB.");
+        return;
+    }
+
+    if (!isValid) {
+        toast.error(
+            "Please select a .yml, .yaml or .json OpenAPI file."
+        );
+        return;
+    }
+    
     setSelectedFile(file);
     setImportResult(null);
   };
@@ -67,8 +84,17 @@ export function ImportOpenApiDialog({ orgSlug, projectSlug }: ImportOpenApiDialo
 
   const handleImport = async () => {
     if (!selectedFile) return;
-    const result = await importMutation.mutateAsync({ file: selectedFile, orgSlug, projectSlug });
-    setImportResult(result);
+    try {
+        const result = await importMutation.mutateAsync({
+            file: selectedFile,
+            orgSlug,
+            projectSlug,
+        });
+
+        setImportResult(result);
+    } catch {
+        // Toast is already handled by the hook if you add onError there.
+    }
   };
 
   const handleClearFile = () => {
@@ -160,9 +186,15 @@ export function ImportOpenApiDialog({ orgSlug, projectSlug }: ImportOpenApiDialo
           ) : (
             /* Result summary */
             <ImportResultSummary
-              result={importResult}
-              isSkippedExpanded={isSkippedExpanded}
-              onToggleSkipped={() => setIsSkippedExpanded((v) => !v)}
+                result={importResult}
+                isImportedExpanded={isImportedExpanded}
+                isSkippedExpanded={isSkippedExpanded}
+                onToggleImported={() =>
+                    setIsImportedExpanded(v => !v)
+                }
+                onToggleSkipped={() =>
+                    setIsSkippedExpanded(v => !v)
+                }
             />
           )}
         </div>
@@ -193,22 +225,48 @@ export function ImportOpenApiDialog({ orgSlug, projectSlug }: ImportOpenApiDialo
 
 interface ImportResultSummaryProps {
   result: OpenApiImportResponse;
+  isImportedExpanded: boolean;
   isSkippedExpanded: boolean;
+  onToggleImported: () => void;
   onToggleSkipped: () => void;
 }
 
-function ImportResultSummary({ result, isSkippedExpanded, onToggleSkipped }: ImportResultSummaryProps) {
-  const { totalImported, totalSkipped, skipped } = result;
+function ImportResultSummary({
+    result,
+    isImportedExpanded,
+    isSkippedExpanded,
+    onToggleImported,
+    onToggleSkipped,
+}: ImportResultSummaryProps) {
+  const {imported, skipped, totalImported, totalSkipped,} = result;
 
   return (
     <div className="space-y-3">
-      {/* Imported count */}
-      <div className="flex items-center gap-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 px-4 py-3">
-        <div className="h-2 w-2 rounded-full bg-green-500 shrink-0" />
-        <p className="text-sm font-medium text-green-800 dark:text-green-300">
-          {totalImported} schema{totalImported !== 1 ? 's' : ''} imported successfully
-        </p>
-      </div>
+
+        {/* Imported count */}
+        <div className="rounded-lg border border-green-200 dark:border-green-900 overflow-hidden">
+        <button
+            className="w-full flex items-center justify-between px-4 py-3 bg-green-50 dark:bg-green-950/30"
+            onClick={onToggleImported}
+        >
+            <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-green-500" />
+            <p className="text-sm font-medium">
+                {totalImported} schema{totalImported !== 1 ? "s" : ""} imported successfully
+            </p>
+            </div>
+
+            {isImportedExpanded ? (
+            <ChevronUp className="h-4 w-4" />
+            ) : (
+            <ChevronDown className="h-4 w-4" />
+            )}
+        </button>
+
+        {isImportedExpanded && (
+            <ImportedList items={imported} />
+        )}
+        </div>
 
       {/* Skipped (if any) */}
       {totalSkipped > 0 && (
@@ -236,6 +294,27 @@ function ImportResultSummary({ result, isSkippedExpanded, onToggleSkipped }: Imp
         </div>
       )}
     </div>
+  );
+}
+
+interface ImportedListProps {
+  items: ImportedSchema[];
+}
+
+function ImportedList({ items }: ImportedListProps) {
+  return (
+    <ul className="divide-y divide-border max-h-48 overflow-y-auto">
+      {items.map((item) => (
+        <li
+          key={item.id}
+          className="px-4 py-2.5 flex items-center gap-3"
+        >
+          <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">
+            {item.name}
+          </code>
+        </li>
+      ))}
+    </ul>
   );
 }
 

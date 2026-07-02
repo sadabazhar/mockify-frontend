@@ -1,3 +1,4 @@
+import { handleApiError } from "@/api/client";
 import { OpenApi } from "@/api/openapi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -16,20 +17,24 @@ export function useImportOpenApi() {
         OpenApi.import(orgSlug, projectSlug, file),
 
         onSuccess: (response, variables) => {
-        const { orgSlug, projectSlug } = variables;
+            const { orgSlug, projectSlug } = variables;
 
-        // Refresh project and schema details
-        queryClient.invalidateQueries({queryKey: ['schemas', orgSlug, projectSlug],});
-        queryClient.invalidateQueries({queryKey: ['projects', orgSlug, projectSlug],});
+            // Refresh project and schema details
+            queryClient.invalidateQueries({queryKey: ['schemas', orgSlug, projectSlug],});
+            queryClient.invalidateQueries({queryKey: ['projects', orgSlug, projectSlug],});
 
-        // Refresh dashboard stats that might be affected by the new schemas
-        queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
-        queryClient.invalidateQueries({queryKey: ['dashboard', 'project']}); 
-        queryClient.invalidateQueries({queryKey: ['dashboard', 'schema']}); 
+            // Refresh dashboard stats that might be affected by the new schemas
+            queryClient.invalidateQueries({queryKey: ['dashboard', 'user']});
+            queryClient.invalidateQueries({queryKey: ['dashboard', 'project']}); 
+            queryClient.invalidateQueries({queryKey: ['dashboard', 'schema']}); 
 
-        toast.success(
-            `Imported ${response.totalImported} schema${response.totalImported === 1 ? "" : "s"}`
-        );
+            toast.success(
+                `Imported ${response.totalImported} schema${response.totalImported === 1 ? "" : "s"}`
+            );
+        },
+
+        onError: (error) => {
+            toast.error(handleApiError(error));
         },
     });
 }

@@ -10,8 +10,11 @@ export const OpenApi = {
     const formData = new FormData();
     formData.append("file", file);
 
-    return api.post(`${orgSlug}/${projectSlug}/import/openapi`,
-        formData
+    const { data } = await api.post<OpenApiImportResponse>(
+    `${orgSlug}/${projectSlug}/import/openapi`,
+    formData
     );
+
+    return data;
   },
 };
