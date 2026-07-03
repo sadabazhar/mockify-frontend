@@ -119,6 +119,9 @@ export const useAutoGenerateRecords = () => {
         queryKey: ["records"],
       });
     },
+    onError: (error) => {
+    toast.error("Failed to generate records", { description: error.message });
+  },
   });
 };
 
