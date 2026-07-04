@@ -70,4 +70,20 @@ export const recordsApi = {
       `/${orgSlug}/${projectSlug}/${schemaSlug}/records/${recordId}`
     );
   },
+
+  autoGenerate: async (
+    orgSlug: string,
+    projectSlug: string,
+    schemaSlug: string,
+    count: number,
+  ): Promise<MockRecord[]> => {
+   const response = await apiClient.post<MockRecord[]>(
+    `/${orgSlug}/${projectSlug}/${schemaSlug}/records/auto-bulk`,
+    {
+      count
+    },
+  );
+
+   return response.data;
+ },
 };
