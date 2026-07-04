@@ -349,3 +349,30 @@ export interface InvitationResponse {
   expiresAt: string;
   createdAt: string;
 }
+
+
+// Open API types
+export interface OpenApiImportResponse {
+  imported: ImportedSchema[];
+  skipped: SkippedComponent[];
+  totalImported: number;
+  totalSkipped: number;
+}
+
+export interface ImportedSchema {
+  id: string;
+  name: string;
+  slug: string;
+  projectId: string;
+  projectName: string;
+  schemaJson: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  recordCount: number;
+  endpointUrl: string;
+}
+
+export interface SkippedComponent {
+  component: string;
+  reason: string;
+}
