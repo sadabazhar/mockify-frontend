@@ -16,6 +16,11 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  # Ensure the browser always checks for the latest index.html
+  for = "/index.html"
+  [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
