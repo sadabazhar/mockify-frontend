@@ -20,15 +20,15 @@ export const useOrganizationStats = (orgId: string) => {
 export const useProjectStats = (projectId: string | undefined) => {
     return useQuery({
         queryKey: ['dashboard', 'project', projectId],
-        queryFn: () => dashboardApi.getProjectStats(projectId),
+        queryFn: () => dashboardApi.getProjectStats(projectId!),
         enabled: !!projectId,
     });
 };
 
-export const useSchemaStats = (schemaId: string) => {
+export const useSchemaStats = (schemaId: string | undefined) => {
     return useQuery({
         queryKey: ['dashboard', 'schema', schemaId],
-        queryFn: () => dashboardApi.getSchemaStats(schemaId),
+        queryFn: () => dashboardApi.getSchemaStats(schemaId!),
         enabled: !!schemaId,
     });
 }

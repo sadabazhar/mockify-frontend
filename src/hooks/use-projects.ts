@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+
 import { projectsApi } from '@/api/projects';
-import type { ProjectInput } from '@/lib/validations';
+
 
 export function useProjects(orgSlug: string) {
   return useQuery({

@@ -39,8 +39,7 @@ import type {
 const createKeySchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   description: z.string().max(255).optional(),
-  rateLimitPerMinute: z.coerce
-    .number()
+  rateLimitPerMinute: z.number()
     .int('Must be a whole number')
     .min(1, 'Min 1')
     .max(100_000, 'Max 100 000'),
@@ -416,6 +415,7 @@ export function CreateApiKeyDialog({
                             min={1}
                             max={100000}
                             {...field}
+                            onChange={(e) => field.onChange(e.target.valueAsNumber)}
                           />
                         </FormControl>
                         <FormDescription className="text-xs">

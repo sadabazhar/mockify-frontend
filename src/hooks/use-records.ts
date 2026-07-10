@@ -68,7 +68,7 @@ export function useCreateRecord(
 
   return useMutation({
     mutationFn: (data: Record<string, any>) =>
-      recordsApi.create(orgSlug, projectSlug, schemaSlug, data),
+      recordsApi.create(orgSlug, projectSlug, schemaSlug, { data }),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -136,7 +136,7 @@ export function useUpdateRecord(
   return useMutation({
 
     mutationFn: (data: Record<string, any>) =>
-      recordsApi.update(orgSlug, projectSlug, schemaSlug, recordId, data),
+      recordsApi.update(orgSlug, projectSlug, schemaSlug, recordId, { data }),
 
     onSuccess: (result) => {
         queryClient.invalidateQueries({ queryKey: ['records', result.id] });

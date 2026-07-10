@@ -138,7 +138,7 @@ function ResetPasswordView({ token }: { token: string }) {
           Please request a new password reset link.
         </p>
 
-        <Link to="/reset-password" className="text-sm text-primary">
+        <Link to="/reset-password" search={{ token: undefined }} className="text-sm text-primary">
           Request new reset link
         </Link>
       </div>

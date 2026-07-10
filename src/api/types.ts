@@ -93,6 +93,7 @@ export interface ProjectStats {
 export interface MockSchemaSummary {
   id: string;
   name: string;
+  slug: string;
   recordCount: number;
   createdAt: string;
 }
