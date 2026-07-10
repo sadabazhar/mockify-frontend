@@ -137,6 +137,7 @@ function LoginPage() {
               <div className="flex justify-end">
                 <Link
                   to="/reset-password"
+                  search={{ token: undefined }}
                   className="text-xs text-primary hover:underline"
                 >
                   Forgot password?

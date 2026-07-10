@@ -18,7 +18,7 @@ export interface AuthContextType {
     name: string,
     email: string,
     password: string,
-  ) => Promise<AuthResponse>;
+  ) => Promise<void>;
   logout: () => Promise<void>;
 }
 
