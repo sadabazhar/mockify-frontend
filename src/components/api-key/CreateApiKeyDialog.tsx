@@ -415,6 +415,7 @@ export function CreateApiKeyDialog({
                             min={1}
                             max={100000}
                             {...field}
+                            onChange={(e) => field.onChange(e.target.valueAsNumber)}
                           />
                         </FormControl>
                         <FormDescription className="text-xs">
