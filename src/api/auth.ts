@@ -51,7 +51,7 @@ export const authApi = {
 
   getGoogleAuthUrl: (): string => {
     const baseUrl =
-      import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/';
+      import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
     return `${baseUrl}/oauth2/authorization/google`;
   },
 };
